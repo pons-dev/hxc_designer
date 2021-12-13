@@ -1,9 +1,8 @@
-# Mechanical Stress Calculator
+# Heat Exchanger Designer
 
 ## Description
 
-<p>Heat exchanger design tool. <br />
-Additional description goes here.</p>
+<p>Educational design and analysis tool for heat sinks.</p>
 
 ## IMPORTANT
 
