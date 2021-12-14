@@ -27,6 +27,7 @@ class HeatSink():
     def __init__(self, matl_name, base_h, 
         fin_type, n_fins, fin_len, fin_wid, fin_thk):
         
+        
         #====================================================================================================
         #Input Checks
         #====================================================================================================
@@ -81,6 +82,8 @@ class HeatSink():
         self.param_c = self.__calc_param_c() #Non-dimensional parameter for curved fins
         self.fin_eff = self.__calc_fin_efficiency() #Fin efficiency (aka Nu)
         self.fin_area = self.__calc_fin_area() #Fin surface area (along the length/width plane)
+        self.base_area_tot = self.__calc_base_area_tot() #Total base cross-sectional area, disregarding fins
+        self.base_area_nonfin = self.__calc_base_area_nonfin #Exposed base area, excluding area taken up by fins
 
     #========================================================================================================
     #Fin characteristic calculations
@@ -149,6 +152,18 @@ class HeatSink():
         else: #Catch invalid fin types
             raise ValueError('Fin efficiency not calculated for fin type.')
         return fin_area
+
+    def __calc_base_area_tot(self):
+        return self.base_h * self.fin_wid #Fin assumed to span entire base length
+    
+    def __calc_base_area_nonfin(self):
+        #Fins with rectangular bases
+        fins_rect = ['straight rectangular fin', 'straight triangular fin', 'straight parabolic fin']
+        if self.fin_type in fins_rect:
+            base_area_nonfin = self.base_area_tot - self.n_fins * self.fin_thk * self.fin_wid
+        else: #Catch invavlid fin types
+            raise ValueError('Base area calculations only valid for supported rectangular fin types.')
+        return base_area_nonfin
     
     #========================================================================================================
     #Heat transfer calculations

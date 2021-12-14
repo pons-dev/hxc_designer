@@ -7,7 +7,7 @@ Description
     =========================================
     materials is a Python module used for thermal calculations.
     Its aim is to provide thermal material properties.
-    It is a part of the hxc_designer module.
+    It is a part of the heat_sink submodule of the hxc_designer module.
 
 Classes:
     Material
@@ -25,8 +25,8 @@ class Material():
         __allowed_material_names=[
             'example'
         ]
-        if material_name.lower() not in __allowed_fin_types: #Check for correct fin type input
-            err_msg = 'Invalid material_name. \nAllowed materials:\n{}'.format("\n".join(__allowed_fin_types))
+        if material_name.lower() not in __allowed_material_names: #Check for correct fin type input
+            err_msg = 'Invalid material_name. \nAllowed materials:\n{}'.format("\n".join(__allowed_material_names))
             raise ValueError(err_msg)
         self.material_name = material_name.lower()
         self.coeff_h = self.__get_convection_coefficient(self.material_name)
