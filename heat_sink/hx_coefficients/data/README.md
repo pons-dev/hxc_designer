@@ -1,7 +1,9 @@
 # Heat Transfer Coefficient Data
 ## Units
-Temperature (T):                 °C
-Heat transfer coefficient (k):   W/mK.
+|Variable                      |Unit    |
+|------------------------------|:------:|
+|Temperature (T):              |  °C    |
+|Heat transfer coefficient (k):|  W/mK  |
 ## Reference
     Engineering ToolBox, (2005). 
         Metals, Metallic Elements and Alloys - Thermal Conductivities. [online] 
