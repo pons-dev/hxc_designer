@@ -1,0 +1,100 @@
+﻿Material,T,k
+Aluminum,-73,237
+Aluminum,0,236
+Aluminum,127,240
+Aluminum,327,232
+Aluminum,527,220
+Aluminum bronze,0,70
+Aluminum bronze,25,70
+"Aluminum alloy 3003, rolled",0,190
+"Aluminum alloy 3003, rolled",25,190
+Aluminum alloy 2014. annealed,0,190
+Aluminum alloy 2014. annealed,25,190
+Aluminum alloy 360,0,150
+Aluminum alloy 360,25,150
+Copper,-73,413
+Copper,0,401
+Copper,127,392
+Copper,327,383
+Copper,527,371
+Copper,727,357
+Copper,927,342
+"Copper, electrolytic (ETP)",0,390
+"Copper, electrolytic (ETP)",25,390
+Copper - Admiralty Brass,20,111
+"Copper - Aluminum Bronze (95% Cu, 5% Al)",20,83
+"Copper - Bronze (75% Cu, 25% Sn)",20,26
+"Copper - Brass (Yellow Brass) (70% Cu, 30% Zn)",20,111
+Copper - Cartridge brass (UNS C26000),20,120
+"Copper - Constantan  (60% Cu, 40% Ni)",20,22.7
+"Copper - German Silver (62% Cu, 15% Ni, 22% Zn)",20,24.9
+"Copper - Phosphor bronze (10% Sn, UNS C52400)",20,50
+"Copper - Red Brass (85% Cu, 9% Sn, 6%Zn)",20,61
+Gold,-73,327
+Gold,0,318
+Gold,127,312
+Gold,327,304
+Gold,527,292
+Gold,727,278
+Gold,927,262
+Iron,-73,94
+Iron,0,83.5
+Iron,127,69.4
+Iron,327,54.7
+Iron,527,43.3
+Iron,727,32.6
+Iron,927,28.2
+Iron - Cast,20,52
+Iron - Nodular pearlitic,100,31
+Iron - Wrought,20,59
+Platinum,-73,72.4
+Platinum,0,71.5
+Platinum,127,71.6
+Platinum,327,73
+Platinum,527,75.5
+Platinum,727,78.6
+Platinum,927,82.6
+Silver,-73,403
+Silver,0,428
+Silver,127,420
+Silver,327,405
+Silver,527,389
+Silver,727,374
+Silver,927,358
+"Steel - Carbon, 0.5% C",20,54
+"Steel - Carbon, 1% C",20,43
+"Steel - Carbon, 1.5% C",20,36
+"Steel - Carbon, 1.5% C",400,36
+"Steel - Carbon, 1.5% C",122,33
+"Steel - Chrome, 1% Cr",20,61
+"Steel - Chrome, 5% Cr",20,40
+"Steel - Chrome, 10% Cr",20,31
+"Steel - Chrome Nickel, 15% Cr, 10% Ni",20,19
+"Steel - Chrome Nickel, 20% Cr, 15% Ni",20,15.1
+Steel - Hastelloy B,20,10
+Steel - Hastelloy C,21,8.7
+"Steel - Nickel, 10% Ni",20,26
+"Steel - Nickel, 20% Ni",20,19
+"Steel - Nickel, 40% Ni",20,10
+"Steel - Nickel, 60% Ni",20,19
+"Steel - Nickel Chrome, 80% Ni, 15% Ni",20,17
+"Steel - Nickel Chrome, 40% Ni, 15% Ni",20,11.6
+"Steel - Manganese, 1% Mn",20,50
+"Steel - Stainless, Type 304",20,14.4
+"Steel - Stainless, Type 347",20,14.3
+"Steel - Tungsten, 1% W",20,66
+Steel - Wrought Carbon,0,59
+Titanium,-73,24.5
+Titanium,0,22.4
+Titanium,127,20.4
+Titanium,327,19.4
+Titanium,527,19.7
+Titanium,727,20.7
+Titanium,927,22
+Tungsten,-73,197
+Tungsten,0,182
+Tungsten,127,162
+Tungsten,327,139
+Tungsten,527,128
+Tungsten,727,121
+Tungsten,927,115

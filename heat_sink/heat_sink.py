@@ -18,31 +18,100 @@ Functions:
 Misc Variables:
     __version__
     var1
+
+
+References:
+    Cengel, Y.A. & Ghajar, A.J., (2015).
+        Heat and Mass Transfer: Fundamentals & Applications, 5th Ed.
+        McGraw Hill-Education, New York, NY.
+    
 """
-from materials.materials import Material
 from math import log as ln, sqrt as sqrt, tanh as tanh
 from scipy.special import iv #Modified Bessel function
 import numpy as np
 import pandas as pd
 
+#============================================================================================================
+#Class Definitions:
+#============================================================================================================
 class HeatSink():
-    def __init__(self, matl_name, base_h, 
-        fin_type, n_fins, fin_len, fin_wid, fin_thk):
-        
-        
+    def __init__(self, hx_coeff, base_h, fin_type, n_fins, fin_len, fin_wid, fin_thk):
+        """HeatSink object for heat transfer calculations.
+        Assumptions:
+            Geometry:
+                - Fins extend from end-to-end of the base plate.
+                    - Total base area = base height * fin width
+                - Fins are located on either end of base plate. (minimum 2 fins)
+            Heat Transfer:
+                - Heat conduction is steady and one dimensional.
+                - Radiative heat transfer is negligible.
+                - The effect of heat transfer from the L/t plane faces is negligible.
+                - Temperature across the base plate of the heat sink is uniform.
+            Properties:
+                - Thermal conducitivity coefficient k is uniform across the heat sink.
+                - Convection coefficient h is uniform across the heat sink.
+
+        Parameters
+        ----------
+        hx_coeff : HxCoefficient object
+            Heat transfer coefficient object containing h and k values.
+        base_h : float
+            Height of the base plate.
+            Perpendicular to fin length and fin width vectors.
+            Total base area assumed to be base_h * fin_wid.
+            Parallel to fin thickness vector.
+        fin_type : str
+            Profile category of the fin
+            Allowable inputs:
+                'straight rectangular fin'
+                'straight triangular fin'
+                'straight parabolic fin'
+        n_fins : int
+            Number of fins. Minimum of 2
+        fin_len : float
+            Length of the fin.
+            Normal to the base plate surface plane.
+        fin_wid : float
+            Width of the fin.
+            Perpendicular to base height and fin length vectors.
+            Assumed to span end-to-end of the base plate.
+        fin_thk : float
+            Thickness of the fin.
+            Perpendicular to the fin width and length vectors.
+
+        Raises
+        ------
+        ValueError
+            Input values do not match allowed values.
+        TypeError
+            Input values have an incorrect type.
+        """
         #====================================================================================================
         #Input Checks
         #====================================================================================================
-        #Check fin_types input:
-        __allowed_fin_types = [
+        #Internal paraments for fin type checking:
+        self.__allowed_fin_types = [
             'straight rectangular fin',
             'straight triangular fin',
             'straight parabolic fin'
-        ]
-        if fin_type.lower() not in __allowed_fin_types: #Check for correct fin type input
-            err_msg = 'Invalid fin_type. \nAllowed types:\n{}'.format("\n".join(__allowed_fin_types))
+        ] #Used for error checking
+
+        self.__rectangular_base_fin_types = [
+            'straight rectangular fin',
+            'straight triangular fin',
+            'straight parabolic fin'
+        ] #Used for formula selection
+
+        #Check fin_types input:
+        if fin_type.lower() not in self.__allowed_fin_types: #Check for correct fin type input
+            err_msg = 'Invalid fin_type. \nAllowed types:\n{}'.format("\n".join(self.__allowed_fin_types))
             raise ValueError(err_msg)
 
+        #Check n_fins input:
+        if n_fins < 2:
+            raise ValueError('n_fins must be a minimum of 2')
+        elif type(n_fins) != int:
+            raise TypeError('n_fins must be an integer')
         #Check inputs to determine whether gap size is acceptable:
         __min_gap = 0.0001
         __total_fin_width = n_fins * fin_thk
@@ -69,7 +138,7 @@ class HeatSink():
         #Class variable assignment:
         #====================================================================================================
         #Input parameters
-        self.matl = Material(matl_name) #Material
+        self.hx_coeff = hx_coeff #HxCoefficient object for k and h values
         self.base_h = base_h #Height of the heat sinks base
         self.fin_type = fin_type.lower() #Type of fin
         self.n_fins = n_fins #Number of fins
@@ -130,9 +199,8 @@ class HeatSink():
         ValueError
             If fin_type is not an allowed value.
         """
-        fins_rect = ['straight rectangular fin', 'straight triangular fin', 'straight parabolic fin']
-        if self.fin_type in fins_rect:
-            param_m = sqrt( (2 * self.matl.coeff_h) / (self.matl.coeff_k * self.fin_thk) )
+        if self.fin_type in self.__rectangular_base_fin_types:
+            param_m = sqrt( (2 * self.hx_coeff.h) / (self.hx_coeff.k * self.fin_thk) )
         else: #Catch invalid fin types
             raise ValueError('Parameter m not calculated for fin type.')
         return param_m
@@ -273,8 +341,7 @@ class HeatSink():
             If fin_type is not an allowed value.
         """
         #Fins with rectangular bases
-        fins_rect = ['straight rectangular fin', 'straight triangular fin', 'straight parabolic fin']
-        if self.fin_type in fins_rect:
+        if self.fin_type in self.__rectangular_base_fin_types:
             base_area_nonfin = self.base_area_tot - self.n_fins * self.fin_thk * self.fin_wid
         else: #Catch invavlid fin types
             raise ValueError('Base area calculations only valid for supported rectangular fin types.')
@@ -299,9 +366,7 @@ class HeatSink():
         ValueError
             If fin_type is not an allowed value.
         """
-
-        fins_rect = ['straight rectangular fin', 'straight triangular fin', 'straight parabolic fin']
-        if self.fin_type in fins_rect:
+        if self.fin_type in self.__rectangular_base_fin_types:
             # epsilon_fin = nu_fin * (A_fin / A_fin_base)
             area_fin_base = self.fin_wid * self.fin_thk
             fin_effectiveness = self.fin_efficiency * self.fin_area_total / area_fin_base
@@ -337,7 +402,7 @@ class HeatSink():
     #========================================================================================================
     #Optimization utilities
     #========================================================================================================
-    def suggest_fin_length(matl_name, fin_type, fin_thk,
+    def suggest_fin_length(hx_coeff, fin_type, fin_thk,
                             return_type='df', verbose=True):
         """Calculate suggested fin lengths for a given material, fin type, and fin thickness.
         For most uses, mL = 1.0 to 1.5 should be appropriate. Values exceeding mL = 5.0 result
@@ -359,11 +424,8 @@ class HeatSink():
 
         Parameters
         ----------
-        matl_name : str
-            Material name.
-            Allowed inputs:
-                a
-                b
+        hx_coeff : HxCoefficient object
+            Heat transfer coefficient object from hx_coefficients
         fin_type : str
             Fin types.
             Allowed inputs:
@@ -396,15 +458,13 @@ class HeatSink():
         ValueError
             Invalid input parameter values. Check allowed input values in docstring.
         """
-        matl = Material(matl_name) #Material object for material coefficients
-
         #Calculate param_m
         if fin_type == 'straight rectangular fin':
-            param_m = sqrt( (2 * matl.coeff_h) / (matl.coeff_k * fin_thk) )
+            param_m = sqrt( (2 * hx_coeff.h) / (hx_coeff.k * fin_thk) )
         elif fin_type == 'straight triangular fin':
-            param_m = sqrt( (2 * matl.coeff_h) / (matl.coeff_k * fin_thk) )
+            param_m = sqrt( (2 * hx_coeff.h) / (hx_coeff.k * fin_thk) )
         elif fin_type == 'straight parabolic fin':
-            param_m = sqrt( (2 * matl.coeff_h) / (matl.coeff_k * fin_thk) )
+            param_m = sqrt( (2 * hx_coeff.h) / (hx_coeff.k * fin_thk) )
         else: #Catch invalid fin types
             raise ValueError('Parameter m not calculated for fin type.')
         
@@ -464,7 +524,7 @@ class HeatSink():
         """
         #Q_fin = nu_fin * h * A_fin * (T_base - T_inf)
         delta_t = temp_base - temp_env
-        q_fin = self.fin_efficiency * self.matl.coeff_h * self.fin_area_single * delta_t
+        q_fin = self.fin_efficiency * self.hx_coeff.h * self.fin_area_single * delta_t
         return q_fin
 
     def calc_q_fin_total(self, temp_base, temp_env):
@@ -490,7 +550,7 @@ class HeatSink():
         """
         #Q_fin = nu_fin * h * A_fin * (T_base - T_inf)
         delta_t = temp_base - temp_env
-        q_fin = self.fin_efficiency * self.matl.coeff_h * self.fin_area_total * delta_t
+        q_fin = self.fin_efficiency * self.hx_coeff.h * self.fin_area_total * delta_t
         return q_fin
 
     def calc_q_heat_sink(self, temp_base, temp_env):
@@ -518,8 +578,8 @@ class HeatSink():
         #Q_fin = h * (A_nonfin + nu_fin * A_fin) * (T_base - T_inf)
         delta_t = temp_base - temp_env
         area_effective = self.base_area_nonfin + self.fin_efficiency * self.fin_area_total #Effective surface area
-        q_heat_sink = self.matl.coeff_h * area_effective * delta_t
+        q_heat_sink = self.hx_coeff.h * area_effective * delta_t
         return q_heat_sink
 
 if __name__ == '__main__':
-    print('Test')
+    print('Test run of heat_sink.py')
