@@ -11,17 +11,17 @@ Description
 
 Classes:
     Abstract:
-    HeatSink
-        Primary parent object to major subtypes of heat sink classes.
-    StraightHeatSink
-        Primary subtype of heat sink. Parent to concrete heat sink classes. Subclass of HeatSink.
+        HeatSink
+            Primary parent object to major subtypes of heat sink classes.
+        StraightHeatSink
+            Primary subtype of heat sink. Parent to concrete heat sink classes. Subclass of HeatSink.
     Concrete:
-    StrRectHeatSink
-        Straight rectangular fin profile heat sink. Subclass of StraightHeatSink.
-    StrTriHeatSink
-        Straight triangular fin profile heat sink. Subclass of StraightHeatSink.
-    StrParaHeatSink
-        Straight parabolic fin profile heat sink. Subclass of StraightHeatSink.
+        StrRectHeatSink
+            Straight rectangular fin profile heat sink. Subclass of StraightHeatSink.
+        StrTriHeatSink
+            Straight triangular fin profile heat sink. Subclass of StraightHeatSink.
+        StrParaHeatSink
+            Straight parabolic fin profile heat sink. Subclass of StraightHeatSink.
 
 Functions:
     suggest_fin_length(hx_coeff, fin_type, fin_thk, return_type='df', verbose=True)
