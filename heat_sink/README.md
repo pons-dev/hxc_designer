@@ -3,21 +3,29 @@
 ## Description
 
 <p>
-Python module for heat sink design. 
-Containss class structure for heat sink objects.
-Objects perform design parameter calculations and provide functions to calculate heat transfer given input temperatures.
-Abstract classes define required behavior of relevant subclasses.
-Concrete classes provide specific class definitions for heat sinks of various profile geometries.
-Since each profile of heat sink is governed by different heat transfer calculations, each warranted a unique object governed by parent classes grouping similar categories of profiles.
+Python module for heat sink design.<br>
+Contains class structure for heat sink objects.<br>
+Used to determine performance of various heat sink profile designs.<br>
 </p>
 
+## IMPORTANT
+
+<p><strong>THIS IS AN EDUCATIONAL TOOL AND MUST NOT BE USED FOR REAL ENGINEERING APPLICATIONS</strong></p>
+
 ### Classes
+
+<p>
+Individual classes are provided for each type of heat sink profile (e.g. straight rectangular fin profile heat sinks). Each heat sink profile can be grouped in under a general profile with shared design equations. For example, straight rectangular, triangular, and parabolic fin profile heat sinks have shared equations for straight profile heat sinks. As such, the class of each heat sink profile inherits a general profile abstract class (e.g. StraightHeatSink). Several design equations and attributes are universal to all heat sink profiles, thus each general profile inherits a parent HeatSink class. This class also defines all client interactions with objects for specific heat sink profiles.
+</p>
+
+![Class Structure for Heat Sink Objects](/resources/obj_structure.png)
+
 ```
 Abstract:
     HeatSink
         Primary parent object to major subtypes of heat sink classes.
     StraightHeatSink
-        For use with heat sinks with a straight designs..
+        For use with heat sinks with straight profile designs.
         Subclass of HeatSink. Parent to concrete heat sink classes.
     PinHeatSink (Planned)
         For use with heat sinks with pin designs.
@@ -50,7 +58,7 @@ Concrete:
 ### Class Methods and Attributes
 
 <p>
-The purpose of the classes is to calculate heat transf
+The purpose of the classes in this module is to calculate heat transfer parameters for various heat sink designs. The following public class attributes and methods are universal across all heat sinks objects and allow the user to extract meaningful information for each design.
 </p>
 
 ```
@@ -76,10 +84,6 @@ suggest_fin_length(hx_coeff, fin_type, fin_thk, return_type='df', verbose=True)
     Calculate suggested fin lengths for a given material, fin type, and fin thickness.
 ```
 
-## IMPORTANT
-
-<p><strong>THIS IS AN EDUCATIONAL TOOL AND MUST NOT BE USED FOR REAL ENGINEERING APPLICATIONS</strong></p>
-  
 ## Authors
 
 [Chris Ponsdomenech](https://github.com/pons-dev)
