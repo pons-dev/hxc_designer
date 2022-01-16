@@ -292,11 +292,34 @@ class HeatSink(ABC, HeatTransferMixin):
     #Inherited Public Methods
     #========================================================================================================
     def hx(self, temp_base, temp_env, rtype=list):
+        """Calculates heat transfer across the heat sink.
+
+        Parameters
+        ----------
+        temp_base : float
+            [description]
+        temp_env : float
+            [description]
+        rtype : dtype, optional
+            Format for data return, by default list
+            Options: list, dict
+
+        Returns
+        -------
+        q_values : list or dict
+            Returns rate of heat transfer across the heat sink, 
+            by default list [q_fin_single, q_fin_total, q_heat_sink]
+
+        Raises
+        ------
+        ValueError
+            Invalid rtype. See options for rtype.
+        """
         #TODO: Add method that allows you to enter multiple temperatures for each and return an array of results
         #Heat transfer methods derived from HeatTransferMixin
-        q_fin_single = self.calc_q_fin_single(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_single)
-        q_fin_total = self.calc_q_fin_total(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_total)
-        q_heat_sink = self.calc_q_heat_sink(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_total, self.base_area_nonfin)
+        q_fin_single = self._calc_q_fin_single(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_single)
+        q_fin_total = self._calc_q_fin_total(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_total)
+        q_heat_sink = self._calc_q_heat_sink(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_total, self.base_area_nonfin)
         if rtype==list:
             return [q_fin_single, q_fin_total, q_heat_sink]
         elif rtype==dict:
@@ -1009,7 +1032,7 @@ def suggest_fin_length(hx_coeff, fin_type, fin_thk,
     if fin_type.lower() in ['straight rectangular', 'straight triangular', 'straight parabolic']:
         param_m = sqrt( (2 * hx_coeff.h) / (hx_coeff.k * fin_thk) )
     else: #Catch invalid fin types
-        raise NotImplementedError(f'{fin_type} has not been implemented.}.')
+        raise NotImplementedError(f'{fin_type} has not been implemented.')
     
     length_suggestions = [] #Initialize list for length data
     coeffs = [0.1, 0.2, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0] #m*L values
