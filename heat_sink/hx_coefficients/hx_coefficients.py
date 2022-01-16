@@ -21,7 +21,8 @@ Functions:
 
 Misc Variables:
     __version__
-    var1
+    matl_prop
+        Contains temperature-based material properties for various materials.
 
 References:
     Cengel, Y.A. & Ghajar, A.J., (2015).
@@ -66,10 +67,14 @@ class __MaterialProperties():
         self.matl_dfs = __matl_dfs
     
     def k_val(self, matl, temp):
-        x = self.matl_dfs[matl]['T']
-        y = self.matl_dfs[matl]['k']
-        k_interp = interp1d(x, y, bounds_error=False, fill_value='extrapolate')
-        return k_interp(temp)
+        if self.matl_dfs[matl].shape == (2,):
+            k_val = self.matl_dfs[matl]['k']
+        else:
+            x = self.matl_dfs[matl]['T']
+            y = self.matl_dfs[matl]['k']
+            k_interp = interp1d(x, y, bounds_error=False, fill_value='extrapolate')
+            k_val = float(k_interp(temp))
+        return k_val
 
 class HxCoefficient():
     def __init__(self, k, h):
