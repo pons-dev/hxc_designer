@@ -14,11 +14,11 @@ Used to determine performance of various heat sink profile designs.<br>
 
 ### Classes
 
+<img src="https://github.com/pons-dev/hxc_designer/blob/master/heat_sink/resources/obj_structure.png?raw=true" width=30% height=30%>
+
 <p>
 Individual classes are provided for each type of heat sink profile (e.g. straight rectangular fin profile heat sinks). Each heat sink profile can be grouped in under a general profile with shared design equations. For example, straight rectangular, triangular, and parabolic fin profile heat sinks have shared equations for straight profile heat sinks. As such, the class of each heat sink profile inherits a general profile abstract class (e.g. StraightHeatSink). Several design equations and attributes are universal to all heat sink profiles, thus each general profile inherits a parent HeatSink class. This class also defines all client interactions with objects for specific heat sink profiles.
 </p>
-
-<img src="https://github.com/pons-dev/hxc_designer/blob/master/heat_sink/resources/obj_structure.png?raw=true" width=50% height=50%>
 
 ```
 Abstract:
