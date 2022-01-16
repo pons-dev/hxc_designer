@@ -2,8 +2,14 @@
 
 ## Description
 
-<p>Python module for heat sink design.</p>
-<p>Contains class structure for heat sink design calculations.</p>
+<p>
+Python module for heat sink design. 
+Containss class structure for heat sink objects.
+Objects perform design parameter calculations and provide functions to calculate heat transfer given input temperatures.
+Abstract classes define required behavior of relevant subclasses.
+Concrete classes provide specific class definitions for heat sinks of various profile geometries.
+Since each profile of heat sink is governed by different heat transfer calculations, each warranted a unique object governed by parent classes grouping similar categories of profiles.
+</p>
 
 ### Classes
 ```
@@ -40,7 +46,31 @@ Concrete:
         Parabolic pin fin profile with blunt tip heat sink.
         Subclass of PinHeatSink.
 ```
-### Functions
+
+### Class Methods and Attributes
+
+<p>
+The purpose of the classes is to calculate heat transf
+</p>
+
+```
+Methods:
+    hx(temp_base, temp_env, rtype=list)
+        Calculates rate of heat transfer of the heat sink.
+
+Attributes:
+    fin_efficiency
+        Value of fin efficiency.
+        nu_fin = Q_fin_actual / Q_fin_max_ideal
+    fin_effectiveness
+        Ratio comparing rate of heat transfer with the fins present vs not presesnt.
+        epsilon_fin = Q_fin / Q_nofin
+    overall_fin_effectiveness
+        Accounts for exposed base area in fin effectiveness calculations.
+        epsilon_fin_overall = Q_fin_total / Q_nofin
+```
+
+### General Functions
 ```
 suggest_fin_length(hx_coeff, fin_type, fin_thk, return_type='df', verbose=True)
     Calculate suggested fin lengths for a given material, fin type, and fin thickness.
