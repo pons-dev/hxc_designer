@@ -43,6 +43,24 @@ from scipy.interpolate.interpolate import interp1d
 #============================================================================================================
 class __MaterialProperties():
     def __init__(self):
+        """
+        Temperature-based material properties for metals.
+        Used to find thermal conductivity coefficient k values.
+
+        Parameters
+        ----------
+        None.
+
+        Attributes
+        ----------
+        matl_names : list
+            List containing strings.
+            Contains options for available material properties.
+        matl_df : dict
+            Dict containing a DataFrame for each item in matl_names
+        matl_df_full : DataFrame
+            Full dataframe containing all material, temperature, and k-value data.
+        """
         #Import ./data/k_values_common.csv as a DataFrame
         __fpath_csv = os.path.join(
                 os.path.join(
@@ -50,28 +68,57 @@ class __MaterialProperties():
                     'data'
                     ),
                 'k_values_common.csv')
-        matl_df_full = pd.read_csv(__fpath_csv, index_col=0)
-        matl_names = matl_df_full.index.unique() #Unique material names
+        _matl_df_full = pd.read_csv(__fpath_csv, index_col=0)
+        _matl_names = _matl_df_full.index.unique() #Unique material names
 
         #Create a df for each unique material
-        __matl_dfs = {}
-        for __matl in matl_names:
-            __matl_dfs[__matl] = matl_df_full.loc[__matl, :].copy()
-            if len(__matl_dfs[__matl]) == 1:
-                __matl_dfs[__matl].loc['interp_placeholder', 'T'] = __matl_dfs[__matl].loc[__matl, 'T'] + 0.1
-                __matl_dfs[__matl].loc['interp_placeholder', 'k'] = __matl_dfs[__matl].loc[__matl, 'k']
+        _matl_df = {}
+        for __matl in _matl_names:
+            _matl_df[__matl] = _matl_df_full.loc[__matl, :].copy()
+            # if len(_matl_df[__matl]) == 1: # Removed method for handling materials with one entry
+            #     _matl_df[__matl].loc['interp_placeholder', 'T'] = _matl_df[__matl].loc[__matl, 'T'] + 0.1
+            #     _matl_df[__matl].loc['interp_placeholder', 'k'] = _matl_df[__matl].loc[__matl, 'k']
         
         #Assign variables as class attributes
-        self.matl_df_full = matl_df_full
-        self.matl_names = matl_names
-        self.matl_dfs = __matl_dfs
+        self._matl_df_full = _matl_df_full
+        self._matl_names = _matl_names
+        self._matl_df = _matl_df
+    
+    #Property definitions to force variables into a read-only state
+    @property
+    def matl_names(self):
+        return self._matl_names
+    
+    @property
+    def matl_df(self):
+        return self._matl_df
+    
+    @property
+    def matl_df_full(self):
+        return self._matl_df_full
     
     def k_val(self, matl, temp):
-        if self.matl_dfs[matl].shape == (2,):
-            k_val = self.matl_dfs[matl]['k']
-        else:
-            x = self.matl_dfs[matl]['T']
-            y = self.matl_dfs[matl]['k']
+        """
+        Calculates thermal conductivity coefficient k for given material and temperature.
+
+        Parameters
+        ----------
+        matl : str
+            Material name. Must belong to matl_names.
+        temp : float
+            Temperature, in Celcius
+
+        Returns
+        -------
+        k_val
+            Thermal conductivity coefficient k.
+        """
+        #Condition for when only a single entry exists for the material type
+        if self._matl_df[matl].shape == (2,): #Property has no data on temperature variable
+            k_val = self._matl_df[matl]['k'] 
+        else: #Interpolate based on temperature
+            x = self._matl_df[matl]['T']
+            y = self._matl_df[matl]['k']
             k_interp = interp1d(x, y, bounds_error=False, fill_value='extrapolate')
             k_val = float(k_interp(temp))
         return k_val
@@ -119,10 +166,10 @@ class HxCoefficient():
 #Object Definitions:
 #============================================================================================================
 matl_prop = __MaterialProperties() #Object used to extract material property information
-#matl_prop.matl_names to retrieve available material names
+#matl_prop._matl_names to retrieve available material names
 #matl_prop.k_val(matl, temp) to retrieve k value based on temperature
-#matl_prop.matl_df_full to retrieve a full dataframe of material k values at various temperatures
-#matl_prop.matl_dfs to retrieve a dict containing a DataFrame for each matl_names entry
+#matl_prop._matl_df_full to retrieve a full dataframe of material k values at various temperatures
+#matl_prop._matl_df to retrieve a dict containing a DataFrame for each _matl_names entry
 
 
 
