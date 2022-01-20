@@ -146,7 +146,7 @@ class HeatSink(ABC, HeatTransferMixin):
     def _calc_fin_efficiency(self):
         """Abstract method for subclasses of HeatSink.
         Calculates fin efficiency, aka nu_fin.
-        nu_fin = Q_fin / Q_fin_max.
+        nu_fin = Q_fin_actual / Q_fin_ideal.
         Q_fin_actual : Actual fin heat transfer rate.
         Q_fin_ideal : Ideal, maximum heat transfer rate assuming the
                 entire fin temperature matches that of the base.
@@ -383,32 +383,33 @@ class StraightHeatSink(HeatSink):
     #========================================================================================================
     #Abstract Private Methods
     #========================================================================================================
-    @abstractmethod
-    def _calc_fin_efficiency(self):
-        """Abstract method for subclasses of StraightHeatSink.
-        Calculates fin efficiency, aka nu_fin.
-        nu_fin = Q_fin / Q_fin_max.
-        Q_fin_actual : Actual fin heat transfer rate.
-        Q_fin_ideal : Ideal, maximum heat transfer rate assuming the
-                entire fin temperature matches that of the base.
+    # # Moved to HeatSink
+    # @abstractmethod
+    # def _calc_fin_efficiency(self):
+    #     """Abstract method for subclasses of StraightHeatSink.
+    #     Calculates fin efficiency, aka nu_fin.
+    #     nu_fin = nu_fin = Q_fin_actual / Q_fin_ideal.
+    #     Q_fin_actual : Actual fin heat transfer rate.
+    #     Q_fin_ideal : Ideal, maximum heat transfer rate assuming the
+    #             entire fin temperature matches that of the base.
 
-        Theory:
-        The actual temperature of the fin at given point along its length
-        will be lower than the temperature of the base. Heat transfer
-        will be greater when the delta temperature between the fin and the
-        surrounding environment is greater. Thus fin efficiency compares
-        the actual heat transfer rate (Q_fin_actual), where temperature is not uniform,
-        to an ideal heat transfer rate (Q_fin_ideal), where temperature is
-        uniform and maximum. Fin efficiency varies only as a function of fin
-        geometry. Thus this parameter allows us to evaluate heat transfer rate
-        efficiency based on the fin profile.
+    #     Theory:
+    #     The actual temperature of the fin at given point along its length
+    #     will be lower than the temperature of the base. Heat transfer
+    #     will be greater when the delta temperature between the fin and the
+    #     surrounding environment is greater. Thus fin efficiency compares
+    #     the actual heat transfer rate (Q_fin_actual), where temperature is not uniform,
+    #     to an ideal heat transfer rate (Q_fin_ideal), where temperature is
+    #     uniform and maximum. Fin efficiency varies only as a function of fin
+    #     geometry. Thus this parameter allows us to evaluate heat transfer rate
+    #     efficiency based on the fin profile.
 
-        Returns
-        -------
-        fin_efficiency : float
-            Fin efficiency value Q_fin_actual / Q_fin_ideal.
-        """
-        pass
+    #     Returns
+    #     -------
+    #     fin_efficiency : float
+    #         Fin efficiency value Q_fin_actual / Q_fin_ideal.
+    #     """
+    #     pass
 
     @abstractmethod
     def _calc_fin_area_single(self):
@@ -447,7 +448,7 @@ class StraightHeatSink(HeatSink):
                 attr_val_check = False #Catch invalid data types that fail on comparitor check
         else: #TypeError on invalid object attributes
             raise TypeError('The object hx_coeff must have values for heat transfer coefficients h and k.')
-        if all(attr_check, attr_val_check): #Set if input conditions are met
+        if all([attr_check, attr_val_check]): #Set if input conditions are met
             self._hx_coeff = hx_coeff
         else: #ValueError on invalid attribute values
             raise ValueError('The values of h and k in hx_coeff are invalid.')
@@ -546,6 +547,18 @@ class StraightHeatSink(HeatSink):
             Base area exposed to environment.
         """
         return self.base_area_tot - self.n_fins * self.fin_thk * self.fin_wid
+
+    def _calc_base_area_total(self):
+        """Calculates total base area.
+        Assumes fin width expands entire base length.
+
+        Returns
+        -------
+        base_area_total : float
+            Total base area.
+        """
+        base_area_total = self.base_h * self.fin_wid #Fin assumed to span entire base length
+        return base_area_total
     
     def _calc_fin_effectiveness(self):
         """Calculates fin effecitveness, aka epsilon_fin.
@@ -599,7 +612,7 @@ class StraightHeatSink(HeatSink):
 #Tertiary Class Definitions - Heat Sink Specific Types
 #============================================================================================================
 class StrRectHeatSink(StraightHeatSink):
-    def __init__(self, hx_coeff, fin_type, n_fins, fin_len, fin_wid, fin_thk, base_h):
+    def __init__(self, hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h):
         """StrTriHeatSink object for heat transfer calculations.
         Heat Sink Type: Straight Rectangular Fin Profile
 
@@ -639,7 +652,7 @@ class StrRectHeatSink(StraightHeatSink):
             Total base area assumed to be base_h * fin_wid.
             Parallel to fin thickness vector.
         """
-        super().__init__(hx_coeff, fin_type, n_fins, fin_len, fin_wid, fin_thk, base_h)
+        super().__init__(hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h)
         self._fin_type[1] = 'Rectangular Fin' #Definition for subtype of StraightHeatSink
         self._calc_derived_params() #Calculated derived properties
 
@@ -658,8 +671,8 @@ class StrRectHeatSink(StraightHeatSink):
         self.fin_efficiency = self._calc_fin_efficiency() #Fin efficiency (aka Nu)
         self.fin_area_single = self._calc_fin_area_single() #Fin surface area for a single fin (along the length/width plane)
         self.fin_area_total = self._calc_fin_area_total() #Total fin surface area (along the length/width plane)
-        self.base_area_tot = self._calc_base_area_tot() #Total base cross-sectional area, disregarding fins
-        self.base_area_nonfin = self._calc_base_area_nonfin #Exposed base area, excluding area taken up by fins
+        self.base_area_tot = self._calc_base_area_total() #Total base cross-sectional area, disregarding fins
+        self.base_area_nonfin = self._calc_base_area_nonfin() #Exposed base area, excluding area taken up by fins
         self.fin_effectiveness = self._calc_fin_effectiveness() #Fin effectiveness (aka epsilon_fin)
         self.overall_fin_effectiveness = self._calc_overall_fin_effectiveness() #Overall effectiveness (aka epsilon_fin_overall)
 
@@ -681,7 +694,7 @@ class StrRectHeatSink(StraightHeatSink):
 
     def _calc_fin_efficiency(self):
         """Calculates fin efficiency, aka nu_fin.
-        nu_fin = Q_fin / Q_fin_max.
+        nu_fin = Q_fin_actual / Q_fin_ideal.
         Q_fin_actual : Actual fin heat transfer rate.
         Q_fin_ideal : Ideal, maximum heat transfer rate assuming the
                 entire fin temperature matches that of the base.
@@ -794,14 +807,14 @@ class StrTriHeatSink(StraightHeatSink):
         self.fin_efficiency = self._calc_fin_efficiency() #Fin efficiency (aka Nu)
         self.fin_area_single = self._calc_fin_area_single() #Fin surface area for a single fin (along the length/width plane)
         self.fin_area_total = self._calc_fin_area_total() #Total fin surface area (along the length/width plane)
-        self.base_area_tot = self._calc_base_area_tot() #Total base cross-sectional area, disregarding fins
-        self.base_area_nonfin = self._calc_base_area_nonfin #Exposed base area, excluding area taken up by fins
+        self.base_area_tot = self._calc_base_area_total() #Total base cross-sectional area, disregarding fins
+        self.base_area_nonfin = self._calc_base_area_nonfin() #Exposed base area, excluding area taken up by fins
         self.fin_effectiveness = self._calc_fin_effectiveness() #Fin effectiveness (aka epsilon_fin)
         self.overall_fin_effectiveness = self._calc_overall_fin_effectiveness() #Overall effectiveness (aka epsilon_fin_overall)
 
     def _calc_fin_efficiency(self):
         """Calculates fin efficiency, aka nu_fin.
-        nu_fin = Q_fin / Q_fin_max.
+        nu_fin = Q_fin_actual / Q_fin_ideal.
         Q_fin_actual : Actual fin heat transfer rate.
         Q_fin_ideal : Ideal, maximum heat transfer rate assuming the
                 entire fin temperature matches that of the base.
@@ -912,8 +925,8 @@ class StrParaHeatSink(StraightHeatSink):
         self.fin_efficiency = self._calc_fin_efficiency() #Fin efficiency (aka Nu)
         self.fin_area_single = self._calc_fin_area_single() #Fin surface area for a single fin (along the length/width plane)
         self.fin_area_total = self._calc_fin_area_total() #Total fin surface area (along the length/width plane)
-        self.base_area_tot = self._calc_base_area_tot() #Total base cross-sectional area, disregarding fins
-        self.base_area_nonfin = self._calc_base_area_nonfin #Exposed base area, excluding area taken up by fins
+        self.base_area_tot = self._calc_base_area_total() #Total base cross-sectional area, disregarding fins
+        self.base_area_nonfin = self._calc_base_area_nonfin() #Exposed base area, excluding area taken up by fins
         self.fin_effectiveness = self._calc_fin_effectiveness() #Fin effectiveness (aka epsilon_fin)
         self.overall_fin_effectiveness = self._calc_overall_fin_effectiveness() #Overall effectiveness (aka epsilon_fin_overall)
     
@@ -930,7 +943,7 @@ class StrParaHeatSink(StraightHeatSink):
 
     def _calc_fin_efficiency(self):
         """Calculates fin efficiency, aka nu_fin.
-        nu_fin = Q_fin / Q_fin_max.
+        nu_fin = Q_fin_actual / Q_fin_ideal.
         Q_fin_actual : Actual fin heat transfer rate.
         Q_fin_ideal : Ideal, maximum heat transfer rate assuming the
                 entire fin temperature matches that of the base.
