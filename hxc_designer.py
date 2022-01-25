@@ -19,3 +19,11 @@ Misc Variables:
     
 """
 from heat_sink import heat_sink
+from enum import Enum
+
+class HeatSinkType(Enum):
+    Straight_Rectangular = 1 
+    Straight_Triangular = 2
+    Straight_Parabolic = 3
+
+
