@@ -39,7 +39,7 @@ References:
     
 """
 from math import log as ln, sqrt as sqrt, tanh as tanh
-from scipy.special import iv #Modified Bessel function
+from scipy.special import iv  # Modified Bessel function
 import numpy as np
 import pandas as pd
 
@@ -48,9 +48,9 @@ from hx_equations.hx_equations import HeatTransferMixin
 from hx_coefficients.hx_coefficients import HxCoefficient
 
 
-#============================================================================================================
-#WIP Notes: TODO: REMOVE BEFORE PROD
-#============================================================================================================
+# ============================================================================================================
+# WIP Notes: TODO: REMOVE BEFORE PROD
+# ============================================================================================================
 """
 TODO:
     Implement common methods like __repr__
@@ -78,9 +78,9 @@ TODO:
         Make sure that any copy/pasted ones to abstract classes have unnecessary components removed.
 
 """
-#============================================================================================================
-#Primary Abstract Base Class Definition:
-#============================================================================================================
+# ============================================================================================================
+# Primary Abstract Base Class Definition:
+# ============================================================================================================
 class HeatSink(ABC, HeatTransferMixin):
     def __init__(self, hx_coeff, n_fins, fin_len):
         """Abstract base class for heat sink classes.
@@ -106,13 +106,13 @@ class HeatSink(ABC, HeatTransferMixin):
             Length of the fin.
             Normal to the base plate surface plane.
         """
-        self.hx_coeff = hx_coeff # hx_coefficient.HeatTransfer object
-        self.n_fins = n_fins # Number of fins
-        self.fin_len = fin_len # Length of the fin
+        self.hx_coeff = hx_coeff  # hx_coefficient.HeatTransfer object
+        self.n_fins = n_fins  # Number of fins
+        self.fin_len = fin_len  # Length of the fin
 
-    #========================================================================================================
-    #Abstract Properties
-    #========================================================================================================
+    # ========================================================================================================
+    # Abstract Properties
+    # ========================================================================================================
     @property
     @abstractmethod
     def fin_type(self):
@@ -130,9 +130,9 @@ class HeatSink(ABC, HeatTransferMixin):
         """
         pass
 
-    #========================================================================================================
-    #Abstract Private Methods
-    #========================================================================================================
+    # ========================================================================================================
+    # Abstract Private Methods
+    # ========================================================================================================
     @abstractmethod
     def _calc_derived_params(self):
         """Abstract method for subclasses of HeatSink.
@@ -247,9 +247,9 @@ class HeatSink(ABC, HeatTransferMixin):
         """
         pass
 
-    #========================================================================================================
-    #Inherited Properties w/ Input Validation
-    #========================================================================================================
+    # ========================================================================================================
+    # Inherited Properties w/ Input Validation
+    # ========================================================================================================
     @property
     def n_fins(self):
         """Number of fins.
@@ -260,16 +260,16 @@ class HeatSink(ABC, HeatTransferMixin):
             [description]
         """
         return self._n_fins
-    
+
     @n_fins.setter
     def n_fins(self, n_fins):
-        if n_fins >= 2 and type(n_fins)==int:
+        if n_fins >= 2 and type(n_fins) == int:
             self._n_fins = n_fins
         else:
             if type(n_fins) != int:
-                raise TypeError('Number of fins must be an integer.')
+                raise TypeError("Number of fins must be an integer.")
             else:
-                raise ValueError('')
+                raise ValueError("")
 
     @property
     def fin_len(self):
@@ -286,11 +286,11 @@ class HeatSink(ABC, HeatTransferMixin):
         if fin_length > 0:
             self._fin_len = fin_length
         else:
-            raise ValueError('Fin length must be greater than 0.')
-    
-    #========================================================================================================
-    #Inherited Public Methods
-    #========================================================================================================
+            raise ValueError("Fin length must be greater than 0.")
+
+    # ========================================================================================================
+    # Inherited Public Methods
+    # ========================================================================================================
     def hx(self, temp_base, temp_env, rtype=list):
         """Calculates heat transfer across the heat sink.
 
@@ -307,7 +307,7 @@ class HeatSink(ABC, HeatTransferMixin):
         Returns
         -------
         q_values : list or dict
-            Returns rate of heat transfer across the heat sink, 
+            Returns rate of heat transfer across the heat sink,
             by default list [q_fin_single, q_fin_total, q_heat_sink]
 
         Raises
@@ -315,21 +315,48 @@ class HeatSink(ABC, HeatTransferMixin):
         ValueError
             Invalid rtype. See options for rtype.
         """
-        #TODO: Add method that allows you to enter multiple temperatures for each and return an array of results
-        #Heat transfer methods derived from HeatTransferMixin
-        q_fin_single = self._calc_q_fin_single(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_single)
-        q_fin_total = self._calc_q_fin_total(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_total)
-        q_heat_sink = self._calc_q_heat_sink(self, temp_base, temp_env, self.hx_coeff, self.fin_efficiency, self.fin_area_total, self.base_area_nonfin)
-        if rtype==list:
+        # TODO: Add method that allows you to enter multiple temperatures for each and return an array of results
+        # Heat transfer methods derived from HeatTransferMixin
+        q_fin_single = self._calc_q_fin_single(
+            self,
+            temp_base,
+            temp_env,
+            self.hx_coeff,
+            self.fin_efficiency,
+            self.fin_area_single,
+        )
+        q_fin_total = self._calc_q_fin_total(
+            self,
+            temp_base,
+            temp_env,
+            self.hx_coeff,
+            self.fin_efficiency,
+            self.fin_area_total,
+        )
+        q_heat_sink = self._calc_q_heat_sink(
+            self,
+            temp_base,
+            temp_env,
+            self.hx_coeff,
+            self.fin_efficiency,
+            self.fin_area_total,
+            self.base_area_nonfin,
+        )
+        if rtype == list:
             return [q_fin_single, q_fin_total, q_heat_sink]
-        elif rtype==dict:
-            return {'q_fin_single':q_fin_single, 'q_fin_total':q_fin_total, 'q_heat_sink':q_heat_sink}
+        elif rtype == dict:
+            return {
+                "q_fin_single": q_fin_single,
+                "q_fin_total": q_fin_total,
+                "q_heat_sink": q_heat_sink,
+            }
         else:
-            raise ValueError('Invalid return type.')
+            raise ValueError("Invalid return type.")
 
-#============================================================================================================
-#Secondary Abstract Class Definitions - Heat Sink General Types - Parents class to individual heat sink types
-#============================================================================================================
+
+# ============================================================================================================
+# Secondary Abstract Class Definitions - Heat Sink General Types - Parents class to individual heat sink types
+# ============================================================================================================
 class StraightHeatSink(HeatSink):
     def __init__(self, hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h):
         """Abstract parent class for fins with a straight profile.
@@ -370,19 +397,19 @@ class StraightHeatSink(HeatSink):
             Total base area assumed to be base_h * fin_wid.
             Parallel to fin thickness vector.
         """
-        self._fin_type = ['Straight', '']
+        self._fin_type = ["Straight", ""]
         super().__init__(hx_coeff, n_fins, fin_len)
-        self.fin_wid = fin_wid # Width of the fin, 
-        self.fin_thk = fin_thk # Thickness of the fin
-        self.base_h = base_h # Height of the base plate
+        self.fin_wid = fin_wid  # Width of the fin,
+        self.fin_thk = fin_thk  # Thickness of the fin
+        self.base_h = base_h  # Height of the base plate
 
-        self._MIN_GAP = 0.0001 #Minimum allowed gap between fins
-        _total_fin_width = n_fins * fin_thk #Total fin width across full heat sink
-        self.gap = ( base_h - _total_fin_width ) / (n_fins - 1) #Gap between each fin
+        self._MIN_GAP = 0.0001  # Minimum allowed gap between fins
+        _total_fin_width = n_fins * fin_thk  # Total fin width across full heat sink
+        self.gap = (base_h - _total_fin_width) / (n_fins - 1)  # Gap between each fin
 
-    #========================================================================================================
-    #Abstract Private Methods
-    #========================================================================================================
+    # ========================================================================================================
+    # Abstract Private Methods
+    # ========================================================================================================
     # # Moved to HeatSink
     # @abstractmethod
     # def _calc_fin_efficiency(self):
@@ -424,57 +451,61 @@ class StraightHeatSink(HeatSink):
             Fin surface area.
         """
         pass
-    
-    #========================================================================================================
-    #Inherited Properties w/ Input Validation
-    #========================================================================================================
+
+    # ========================================================================================================
+    # Inherited Properties w/ Input Validation
+    # ========================================================================================================
     @property
     def fin_type(self):
-        #Add this to docstring: Note: There is no setter function as this value is not to be adjusted
-        return ' '.join(self._fin_type)
+        # Add this to docstring: Note: There is no setter function as this value is not to be adjusted
+        return " ".join(self._fin_type)
 
     @property
     def hx_coeff(self):
         return self._hx_coeff
-    
+
     @hx_coeff.setter
     def hx_coeff(self, hx_coeff):
-        #Check if object passed has heat transfer coefficient attributes
-        attr_check = all([hasattr(hx_coeff, 'h'), hasattr(hx_coeff, 'k')])
-        if attr_check: #If present, check that they are valid
+        # Check if object passed has heat transfer coefficient attributes
+        attr_check = all([hasattr(hx_coeff, "h"), hasattr(hx_coeff, "k")])
+        if attr_check:  # If present, check that they are valid
             try:
                 attr_val_check = all([hx_coeff.h > 0, hx_coeff.k > 0])
             except:
-                attr_val_check = False #Catch invalid data types that fail on comparitor check
-        else: #TypeError on invalid object attributes
-            raise TypeError('The object hx_coeff must have values for heat transfer coefficients h and k.')
-        if all([attr_check, attr_val_check]): #Set if input conditions are met
+                attr_val_check = (
+                    False  # Catch invalid data types that fail on comparitor check
+                )
+        else:  # TypeError on invalid object attributes
+            raise TypeError(
+                "The object hx_coeff must have values for heat transfer coefficients h and k."
+            )
+        if all([attr_check, attr_val_check]):  # Set if input conditions are met
             self._hx_coeff = hx_coeff
-        else: #ValueError on invalid attribute values
-            raise ValueError('The values of h and k in hx_coeff are invalid.')
+        else:  # ValueError on invalid attribute values
+            raise ValueError("The values of h and k in hx_coeff are invalid.")
 
     @property
     def fin_wid(self):
         return self._fin_wid
-    
+
     @fin_wid.setter
     def fin_wid(self, fin_width):
         if fin_width > 0:
             self._fin_wid = fin_width
         else:
-            raise ValueError('Fin width must be greater than 0')
+            raise ValueError("Fin width must be greater than 0")
 
     @property
     def fin_thk(self):
         return self._fin_thk
-    
+
     @fin_thk.setter
     def fin_thk(self, fin_thickness):
         if fin_thickness > 0:
             self._fin_thk = fin_thickness
         else:
-            raise ValueError('Fin thickness must be greater than 0')
-    
+            raise ValueError("Fin thickness must be greater than 0")
+
     @property
     def base_h(self):
         return self._base_h
@@ -484,15 +515,17 @@ class StraightHeatSink(HeatSink):
         if base_height > 0:
             self._base_h = base_height
         else:
-            raise ValueError('Base height must be greater than 0.')
-    
+            raise ValueError("Base height must be greater than 0.")
+
     @property
     def gap(self):
         return self._gap
 
     @gap.setter
     def gap(self, gap_dist):
-        if gap_dist <= 0: #Catch value combinations that produce a negative fin gap size
+        if (
+            gap_dist <= 0
+        ):  # Catch value combinations that produce a negative fin gap size
             err_msg = f"""Base height incompatible with fin parameters.
             Zero or negative gap size produced.
             Current parameters:
@@ -500,7 +533,9 @@ class StraightHeatSink(HeatSink):
                 n_fins: {self.n_fins}
                 fin_t: {self.fin_thk}
             This produces a gap size of: {gap_dist:.5f}"""
-        elif gap_dist < self._MIN_GAP: #Catch  values that are less than minimum allowed gap size
+        elif (
+            gap_dist < self._MIN_GAP
+        ):  # Catch  values that are less than minimum allowed gap size
             err_msg = f"""Base height incompatible with fin parameters.
             Current parameters:
                 base_h: {self.base_h}
@@ -511,10 +546,10 @@ class StraightHeatSink(HeatSink):
             raise ValueError(err_msg)
         else:
             self._gap = gap_dist
-    
-    #========================================================================================================
-    #Inherited Private Methods
-    #========================================================================================================
+
+    # ========================================================================================================
+    # Inherited Private Methods
+    # ========================================================================================================
     def _calc_fin_param_m(self):
         """Calculate non-dimensional parameter m for Straight fins.
         Used for efficiency calculations.
@@ -524,7 +559,7 @@ class StraightHeatSink(HeatSink):
         param_m : float
             Non-dimensional parameter for efficiency calculations.
         """
-        return sqrt( (2 * self.hx_coeff.h) / (self.hx_coeff.k * self.fin_thk) )
+        return sqrt((2 * self.hx_coeff.h) / (self.hx_coeff.k * self.fin_thk))
 
     def _calc_fin_area_total(self):
         """Calculates total fin surface area.
@@ -557,9 +592,11 @@ class StraightHeatSink(HeatSink):
         base_area_total : float
             Total base area.
         """
-        base_area_total = self.base_h * self.fin_wid #Fin assumed to span entire base length
+        base_area_total = (
+            self.base_h * self.fin_wid
+        )  # Fin assumed to span entire base length
         return base_area_total
-    
+
     def _calc_fin_effectiveness(self):
         """Calculates fin effecitveness, aka epsilon_fin.
         epsilon_fin = Q_fin / Q_nofin
@@ -599,18 +636,20 @@ class StraightHeatSink(HeatSink):
             base surface with no fins.
         """
         # epsilon_fin_overall = ( A_base_nonfin + nu_fin * A_fin ) / A_base_tot
-        overall_fin_effectiveness = ( self.base_area_nonfin + self.fin_efficiency * self.fin_area_total ) / self.base_area_tot
+        overall_fin_effectiveness = (
+            self.base_area_nonfin + self.fin_efficiency * self.fin_area_total
+        ) / self.base_area_tot
         return overall_fin_effectiveness
 
 
-#TODO: Add pin profile heat sink parent and child classes
+# TODO: Add pin profile heat sink parent and child classes
 # class PinHeatSink(HeatSink):
 #     def __init__(self):
 #         raise NotImplementedError()
 
-#============================================================================================================
-#Tertiary Class Definitions - Heat Sink Specific Types
-#============================================================================================================
+# ============================================================================================================
+# Tertiary Class Definitions - Heat Sink Specific Types
+# ============================================================================================================
 class StrRectHeatSink(StraightHeatSink):
     def __init__(self, hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h):
         """StrTriHeatSink object for heat transfer calculations.
@@ -653,28 +692,45 @@ class StrRectHeatSink(StraightHeatSink):
             Parallel to fin thickness vector.
         """
         super().__init__(hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h)
-        self._fin_type[1] = 'Rectangular Fin' #Definition for subtype of StraightHeatSink
-        self._calc_derived_params() #Calculated derived properties
+        self._fin_type[
+            1
+        ] = "Rectangular Fin"  # Definition for subtype of StraightHeatSink
+        self._calc_derived_params()  # Calculated derived properties
 
-    #========================================================================================================
-    #Properties
-    #========================================================================================================
+    # ========================================================================================================
+    # Properties
+    # ========================================================================================================
 
-    #========================================================================================================
-    #Private Methods
-    #========================================================================================================
+    # ========================================================================================================
+    # Private Methods
+    # ========================================================================================================
     def _calc_derived_params(self):
-        """Calculates derived parameters based on the heat sink profile characteristics.
-        """
-        self.fin_len_char = self._calc_fin_characteristic_length() #Calculate characteristic length
-        self.fin_param_m = self._calc_fin_param_m() #Non-dimensional parameter used in fin calculations
-        self.fin_efficiency = self._calc_fin_efficiency() #Fin efficiency (aka Nu)
-        self.fin_area_single = self._calc_fin_area_single() #Fin surface area for a single fin (along the length/width plane)
-        self.fin_area_total = self._calc_fin_area_total() #Total fin surface area (along the length/width plane)
-        self.base_area_tot = self._calc_base_area_total() #Total base cross-sectional area, disregarding fins
-        self.base_area_nonfin = self._calc_base_area_nonfin() #Exposed base area, excluding area taken up by fins
-        self.fin_effectiveness = self._calc_fin_effectiveness() #Fin effectiveness (aka epsilon_fin)
-        self.overall_fin_effectiveness = self._calc_overall_fin_effectiveness() #Overall effectiveness (aka epsilon_fin_overall)
+        """Calculates derived parameters based on the heat sink profile characteristics."""
+        self.fin_len_char = (
+            self._calc_fin_characteristic_length()
+        )  # Calculate characteristic length
+        self.fin_param_m = (
+            self._calc_fin_param_m()
+        )  # Non-dimensional parameter used in fin calculations
+        self.fin_efficiency = self._calc_fin_efficiency()  # Fin efficiency (aka Nu)
+        self.fin_area_single = (
+            self._calc_fin_area_single()
+        )  # Fin surface area for a single fin (along the length/width plane)
+        self.fin_area_total = (
+            self._calc_fin_area_total()
+        )  # Total fin surface area (along the length/width plane)
+        self.base_area_tot = (
+            self._calc_base_area_total()
+        )  # Total base cross-sectional area, disregarding fins
+        self.base_area_nonfin = (
+            self._calc_base_area_nonfin()
+        )  # Exposed base area, excluding area taken up by fins
+        self.fin_effectiveness = (
+            self._calc_fin_effectiveness()
+        )  # Fin effectiveness (aka epsilon_fin)
+        self.overall_fin_effectiveness = (
+            self._calc_overall_fin_effectiveness()
+        )  # Overall effectiveness (aka epsilon_fin_overall)
 
     def _calc_fin_characteristic_length(self):
         """Calculates fin characteristic length.
@@ -690,7 +746,7 @@ class StrRectHeatSink(StraightHeatSink):
         ValueError
             If fin_type is not an allowed value.
         """
-        return self.fin_len + self.fin_thk/2
+        return self.fin_len + self.fin_thk / 2
 
     def _calc_fin_efficiency(self):
         """Calculates fin efficiency, aka nu_fin.
@@ -716,7 +772,9 @@ class StrRectHeatSink(StraightHeatSink):
             Fin efficiency value Q_fin_actual / Q_fin_ideal.
         """
         # nu_fin = tanh(m * L_c) / (m * L_c)
-        return tanh(self.fin_param_m * self.fin_len_char) / (self.fin_param_m * self.fin_len_char)
+        return tanh(self.fin_param_m * self.fin_len_char) / (
+            self.fin_param_m * self.fin_len_char
+        )
 
     def _calc_fin_area_single(self):
         """Calculates the surface area of a single fin.
@@ -731,9 +789,10 @@ class StrRectHeatSink(StraightHeatSink):
         # A_fin = 2*w*L_c
         return 2 * self.fin_wid * self.fin_len_char
 
-    #========================================================================================================
-    #Public Methods
-    #========================================================================================================
+    # ========================================================================================================
+    # Public Methods
+    # ========================================================================================================
+
 
 class StrTriHeatSink(StraightHeatSink):
     def __init__(self, hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h):
@@ -777,13 +836,17 @@ class StrTriHeatSink(StraightHeatSink):
             Parallel to fin thickness vector.
         """
         super().__init__(hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h)
-        self._fin_type[1] = 'Triangular Fin' #Definition for subtype of StraightHeatSink
-        self._profile_formula = 'y = (fin_thk/2)*(1 - x/fin_len)' #Formula for profile contour
-        self._calc_derived_params() #Calculated derived properties
-        
-    #========================================================================================================
-    #Properties
-    #========================================================================================================
+        self._fin_type[
+            1
+        ] = "Triangular Fin"  # Definition for subtype of StraightHeatSink
+        self._profile_formula = (
+            "y = (fin_thk/2)*(1 - x/fin_len)"  # Formula for profile contour
+        )
+        self._calc_derived_params()  # Calculated derived properties
+
+    # ========================================================================================================
+    # Properties
+    # ========================================================================================================
     @property
     def profile_formula(self):
         """Formula that defines the y profile of the heat sink.
@@ -797,20 +860,33 @@ class StrTriHeatSink(StraightHeatSink):
         """
         return self._profile_formula
 
-    #========================================================================================================
-    #Private Methods
-    #========================================================================================================
+    # ========================================================================================================
+    # Private Methods
+    # ========================================================================================================
     def _calc_derived_params(self):
-        """Calculates derived parameters based on the heat sink profile characteristics.
-        """
-        self.fin_param_m = self._calc_fin_param_m() #Non-dimensional parameter used in fin calculations
-        self.fin_efficiency = self._calc_fin_efficiency() #Fin efficiency (aka Nu)
-        self.fin_area_single = self._calc_fin_area_single() #Fin surface area for a single fin (along the length/width plane)
-        self.fin_area_total = self._calc_fin_area_total() #Total fin surface area (along the length/width plane)
-        self.base_area_tot = self._calc_base_area_total() #Total base cross-sectional area, disregarding fins
-        self.base_area_nonfin = self._calc_base_area_nonfin() #Exposed base area, excluding area taken up by fins
-        self.fin_effectiveness = self._calc_fin_effectiveness() #Fin effectiveness (aka epsilon_fin)
-        self.overall_fin_effectiveness = self._calc_overall_fin_effectiveness() #Overall effectiveness (aka epsilon_fin_overall)
+        """Calculates derived parameters based on the heat sink profile characteristics."""
+        self.fin_param_m = (
+            self._calc_fin_param_m()
+        )  # Non-dimensional parameter used in fin calculations
+        self.fin_efficiency = self._calc_fin_efficiency()  # Fin efficiency (aka Nu)
+        self.fin_area_single = (
+            self._calc_fin_area_single()
+        )  # Fin surface area for a single fin (along the length/width plane)
+        self.fin_area_total = (
+            self._calc_fin_area_total()
+        )  # Total fin surface area (along the length/width plane)
+        self.base_area_tot = (
+            self._calc_base_area_total()
+        )  # Total base cross-sectional area, disregarding fins
+        self.base_area_nonfin = (
+            self._calc_base_area_nonfin()
+        )  # Exposed base area, excluding area taken up by fins
+        self.fin_effectiveness = (
+            self._calc_fin_effectiveness()
+        )  # Fin effectiveness (aka epsilon_fin)
+        self.overall_fin_effectiveness = (
+            self._calc_overall_fin_effectiveness()
+        )  # Overall effectiveness (aka epsilon_fin_overall)
 
     def _calc_fin_efficiency(self):
         """Calculates fin efficiency, aka nu_fin.
@@ -836,8 +912,11 @@ class StrTriHeatSink(StraightHeatSink):
             Fin efficiency value Q_fin_actual / Q_fin_ideal.
         """
         # nu_fin = (1/(m*L))*(I_1(2*m*L)/I_0(2*m*L))
-        #Calls a Bessel function. Verify that this is the correct implementation
-        return (1 / (self.fin_param_m * self.fin_len) ) * (iv(1, 2*self.fin_param_m*self.fin_len)/iv(0, 2*self.fin_param_m*self.fin_len))
+        # Calls a Bessel function. Verify that this is the correct implementation
+        return (1 / (self.fin_param_m * self.fin_len)) * (
+            iv(1, 2 * self.fin_param_m * self.fin_len)
+            / iv(0, 2 * self.fin_param_m * self.fin_len)
+        )
 
     def _calc_fin_area_single(self):
         """Calculates the surface area of a single fin.
@@ -850,7 +929,8 @@ class StrTriHeatSink(StraightHeatSink):
             Fin surface area.
         """
         # A_fin = 2 * w * sqrt(L^2 + (t/2)^2)
-        return 2 * self.fin_wid * sqrt( self.fin_len**2 + ( self.fin_thk / 2 )**2 )
+        return 2 * self.fin_wid * sqrt(self.fin_len**2 + (self.fin_thk / 2) ** 2)
+
 
 class StrParaHeatSink(StraightHeatSink):
     def __init__(self, hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h):
@@ -894,13 +974,17 @@ class StrParaHeatSink(StraightHeatSink):
             Parallel to fin thickness vector.
         """
         super().__init__(hx_coeff, n_fins, fin_len, fin_wid, fin_thk, base_h)
-        self._fin_type[1] = 'Parabolic Fin' #Definition for subtype of StraightHeatSink
-        self._profile_formula = '(fin_thk/2)*(1-x/fin_len)^2' #Formula for profile contour
-        self._calc_derived_params() #Calculated derived properties
+        self._fin_type[
+            1
+        ] = "Parabolic Fin"  # Definition for subtype of StraightHeatSink
+        self._profile_formula = (
+            "(fin_thk/2)*(1-x/fin_len)^2"  # Formula for profile contour
+        )
+        self._calc_derived_params()  # Calculated derived properties
 
-    #========================================================================================================
-    #Properties
-    #========================================================================================================
+    # ========================================================================================================
+    # Properties
+    # ========================================================================================================
     @property
     def profile_formula(self):
         """Formula that defines the y profile of the heat sink.
@@ -913,23 +997,36 @@ class StrParaHeatSink(StraightHeatSink):
         profile_formula : str
         """
         return self._profile_formula
-    
-    #========================================================================================================
-    #Private Methods
-    #========================================================================================================
+
+    # ========================================================================================================
+    # Private Methods
+    # ========================================================================================================
     def _calc_derived_params(self):
-        """Calculates derived parameters based on the heat sink profile characteristics.
-        """
-        self.fin_param_m = self._calc_fin_param_m() #Non-dimensional parameter used in fin calculations
-        self.param_c = self._calc_param_c() #Non-dimensional parameter for curved fins
-        self.fin_efficiency = self._calc_fin_efficiency() #Fin efficiency (aka Nu)
-        self.fin_area_single = self._calc_fin_area_single() #Fin surface area for a single fin (along the length/width plane)
-        self.fin_area_total = self._calc_fin_area_total() #Total fin surface area (along the length/width plane)
-        self.base_area_tot = self._calc_base_area_total() #Total base cross-sectional area, disregarding fins
-        self.base_area_nonfin = self._calc_base_area_nonfin() #Exposed base area, excluding area taken up by fins
-        self.fin_effectiveness = self._calc_fin_effectiveness() #Fin effectiveness (aka epsilon_fin)
-        self.overall_fin_effectiveness = self._calc_overall_fin_effectiveness() #Overall effectiveness (aka epsilon_fin_overall)
-    
+        """Calculates derived parameters based on the heat sink profile characteristics."""
+        self.fin_param_m = (
+            self._calc_fin_param_m()
+        )  # Non-dimensional parameter used in fin calculations
+        self.param_c = self._calc_param_c()  # Non-dimensional parameter for curved fins
+        self.fin_efficiency = self._calc_fin_efficiency()  # Fin efficiency (aka Nu)
+        self.fin_area_single = (
+            self._calc_fin_area_single()
+        )  # Fin surface area for a single fin (along the length/width plane)
+        self.fin_area_total = (
+            self._calc_fin_area_total()
+        )  # Total fin surface area (along the length/width plane)
+        self.base_area_tot = (
+            self._calc_base_area_total()
+        )  # Total base cross-sectional area, disregarding fins
+        self.base_area_nonfin = (
+            self._calc_base_area_nonfin()
+        )  # Exposed base area, excluding area taken up by fins
+        self.fin_effectiveness = (
+            self._calc_fin_effectiveness()
+        )  # Fin effectiveness (aka epsilon_fin)
+        self.overall_fin_effectiveness = (
+            self._calc_overall_fin_effectiveness()
+        )  # Overall effectiveness (aka epsilon_fin_overall)
+
     def _calc_param_c(self):
         """Calculate non-dimensional parameter C.
         Used for curved fin profiles calculations.
@@ -939,7 +1036,7 @@ class StrParaHeatSink(StraightHeatSink):
         param_c1 : float
             Non-dimensional parameter C
         """
-        return sqrt(1 + ( self.fin_thk / self.fin_len )**2)
+        return sqrt(1 + (self.fin_thk / self.fin_len) ** 2)
 
     def _calc_fin_efficiency(self):
         """Calculates fin efficiency, aka nu_fin.
@@ -965,7 +1062,7 @@ class StrParaHeatSink(StraightHeatSink):
             Fin efficiency value Q_fin_actual / Q_fin_ideal.
         """
         # nu_fin = 2 / ( 1 + sqrt( (2*m*L)^2 + 1 ) )
-        return 2 / ( 1 + sqrt( ( 2 * self.fin_param_m * self.fin_len ) + 1) )
+        return 2 / (1 + sqrt((2 * self.fin_param_m * self.fin_len) + 1))
 
     def _calc_fin_area_single(self):
         """Calculates the surface area of a single fin.
@@ -977,16 +1074,23 @@ class StrParaHeatSink(StraightHeatSink):
         fin_area_single : float
             Fin surface area.
         """
-        #Note: math.log() is the natural logarithm (aka ln), hence renaming on import
+        # Note: math.log() is the natural logarithm (aka ln), hence renaming on import
         # A_fin = w*L * [ C_1 + (L/t)*ln( t/L + C_1) ]
-        return self.fin_wid * self.fin_len * (self.param_c + \
-            ( self.fin_len / self.fin_thk ) * ln( self.fin_thk / self.fin_len + self.param_c ) )
-    
-#========================================================================================================
-#Optimization utilities
-#========================================================================================================
-def suggest_fin_length(hx_coeff, fin_type, fin_thk,
-                        return_type='df', verbose=True):
+        return (
+            self.fin_wid
+            * self.fin_len
+            * (
+                self.param_c
+                + (self.fin_len / self.fin_thk)
+                * ln(self.fin_thk / self.fin_len + self.param_c)
+            )
+        )
+
+
+# ========================================================================================================
+# Optimization utilities
+# ========================================================================================================
+def suggest_fin_length(hx_coeff, fin_type, fin_thk, return_type="df", verbose=True):
     """Calculate suggested fin lengths for a given material, fin type, and fin thickness.
     For most uses, mL = 1.0 to 1.5 should be appropriate. Values exceeding mL = 5.0 result
     in negligible performance increase. The corresponding length should be considered the max.
@@ -1041,40 +1145,43 @@ def suggest_fin_length(hx_coeff, fin_type, fin_thk,
     ValueError
         Invalid input parameter values. Check allowed input values in docstring.
     """
-    #Calculate param_m
-    if fin_type.lower() in ['straight rectangular', 'straight triangular', 'straight parabolic']:
-        param_m = sqrt( (2 * hx_coeff.h) / (hx_coeff.k * fin_thk) )
-    else: #Catch invalid fin types
-        raise NotImplementedError(f'{fin_type} has not been implemented.')
-    
-    length_suggestions = [] #Initialize list for length data
-    coeffs = [0.1, 0.2, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0] #m*L values
+    # Calculate param_m
+    if fin_type.lower() in [
+        "straight rectangular",
+        "straight triangular",
+        "straight parabolic",
+    ]:
+        param_m = sqrt((2 * hx_coeff.h) / (hx_coeff.k * fin_thk))
+    else:  # Catch invalid fin types
+        raise NotImplementedError(f"{fin_type} has not been implemented.")
+
+    length_suggestions = []  # Initialize list for length data
+    coeffs = [0.1, 0.2, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0]  # m*L values
     for coeff in coeffs:
         fin_len = param_m / coeff
         hx_ratio = tanh(param_m * fin_len)
         length_suggestions.append([fin_len, hx_ratio, coeff])
 
-    if verbose or return_type.lower() in ['df', 'pd', 'dataframe', 'pandas']:
-        #Create dataframe for either verbose mode or dataframe return
-        df = pd.DataFrame(length_suggestions,
-                            columns=[
-                                'Fin Length',
-                                'Q Ratio',
-                                'mL'
-                                ]
-                            )
-        if verbose: 
-            print(f'Suggested fin lengths:\n{df}') #Print out calculations in verbose mode (Default)
-        if return_type.lower() in ['df', 'pd', 'dataframe', 'pandas']:
-            return df #Return pd.DataFrame for specified return_type values (Default)
-    elif return_type.lower() in ['arr', 'np', 'array', 'numpy']:
-        arr = np.array(length_suggestions) #Return np.array for specificied return_type values
-    elif return_type.lower() in ['l', 'list']:
-        return length_suggestions #Return list for specified return_type values
+    if verbose or return_type.lower() in ["df", "pd", "dataframe", "pandas"]:
+        # Create dataframe for either verbose mode or dataframe return
+        df = pd.DataFrame(length_suggestions, columns=["Fin Length", "Q Ratio", "mL"])
+        if verbose:
+            print(
+                f"Suggested fin lengths:\n{df}"
+            )  # Print out calculations in verbose mode (Default)
+        if return_type.lower() in ["df", "pd", "dataframe", "pandas"]:
+            return df  # Return pd.DataFrame for specified return_type values (Default)
+    elif return_type.lower() in ["arr", "np", "array", "numpy"]:
+        arr = np.array(
+            length_suggestions
+        )  # Return np.array for specificied return_type values
+    elif return_type.lower() in ["l", "list"]:
+        return length_suggestions  # Return list for specified return_type values
     elif not return_type:
         pass
     else:
-        raise ValueError('Invalid entry for return_type.')
+        raise ValueError("Invalid entry for return_type.")
 
-if __name__ == '__main__':
-    print('Test run of heat_sink.py')
+
+if __name__ == "__main__":
+    print("Test run of heat_sink.py")

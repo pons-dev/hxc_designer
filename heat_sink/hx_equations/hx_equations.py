@@ -28,8 +28,12 @@ References:
 
 
 """
-class HeatTransferMixin():
-    def _calc_q_fin_single(self, temp_base, temp_env, hx_coeff, fin_efficiency, fin_area_single):
+
+
+class HeatTransferMixin:
+    def _calc_q_fin_single(
+        self, temp_base, temp_env, hx_coeff, fin_efficiency, fin_area_single
+    ):
         """Calculate heat transfer rate for a single fin.
         Q_fin = nu_fin * h * A_fin * (temp_base - temp_env)
         Q_fin : Heat transfer rate of a single fin.
@@ -50,12 +54,14 @@ class HeatTransferMixin():
         q_fin : float
             Heat transfer rate of a single fin.
         """
-        #Q_fin = nu_fin * h * A_fin * (T_base - T_inf)
+        # Q_fin = nu_fin * h * A_fin * (T_base - T_inf)
         delta_t = temp_base - temp_env
         q_fin = fin_efficiency * hx_coeff.h * fin_area_single * delta_t
         return q_fin
 
-    def _calc_q_fin_total(self, temp_base, temp_env, hx_coeff, fin_efficiency, fin_area_total):
+    def _calc_q_fin_total(
+        self, temp_base, temp_env, hx_coeff, fin_efficiency, fin_area_total
+    ):
         """Calculate heat transfer rate of all fin area.
         Q_fin = nu_fin * h * A_fin * (temp_base - temp_env)
         Q_fin : Heat transfer rate of all fin area.
@@ -76,12 +82,20 @@ class HeatTransferMixin():
         q_fin : float
             Heat transfer rate of all fin area.
         """
-        #Q_fin = nu_fin * h * A_fin * (T_base - T_inf)
+        # Q_fin = nu_fin * h * A_fin * (T_base - T_inf)
         delta_t = temp_base - temp_env
         q_fin = fin_efficiency * hx_coeff.h * fin_area_total * delta_t
         return q_fin
 
-    def _calc_q_heat_sink(self, temp_base, temp_env, hx_coeff, fin_efficiency, fin_area_total, base_area_nonfin):
+    def _calc_q_heat_sink(
+        self,
+        temp_base,
+        temp_env,
+        hx_coeff,
+        fin_efficiency,
+        fin_area_total,
+        base_area_nonfin,
+    ):
         """Calculate heat transfer rate of the heat sink.
         Q_heat_sink = h * (A_nonfin + nu_fin * A_fin) * (temp_base - temp_env)
         Q_heat_sink : Heat transfer rate of heat sink.
@@ -103,8 +117,10 @@ class HeatTransferMixin():
         q_heat_sink : float
             Heat transfer rate of all fin area.
         """
-        #Q_fin = h * (A_nonfin + nu_fin * A_fin) * (T_base - T_inf)
+        # Q_fin = h * (A_nonfin + nu_fin * A_fin) * (T_base - T_inf)
         delta_t = temp_base - temp_env
-        area_effective = base_area_nonfin + fin_efficiency * fin_area_total #Effective surface area
+        area_effective = (
+            base_area_nonfin + fin_efficiency * fin_area_total
+        )  # Effective surface area
         q_heat_sink = hx_coeff.h * area_effective * delta_t
         return q_heat_sink
