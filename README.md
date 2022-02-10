@@ -1,5 +1,13 @@
 # Heat Exchanger Designer - WIP
 
+## Status
+<p>Heat sink object hierarchy, calculations, and dependencies created.</p>
+
+## ToDo
+* Create method for generating a range of HeatSink subclasses in hxc_designer.py
+* Create UI for input creation
+* Create post-processing dashboard
+
 ## Description
 
 <p>Educational design and analysis tool for heat sinks.</p>
