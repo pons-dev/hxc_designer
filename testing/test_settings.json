@@ -1,0 +1,74 @@
+{
+    "settings":{ 
+        "export": false,
+        "precision": 5
+    },
+    "heat_sink_data":{
+        "temps":[100],
+        "matls":[
+            "Copper",
+            "Steel - Carbon, 1% C",
+            "Aluminum"
+        ],
+        "k_values_ref":{
+            "Copper": {
+                "100": 393.91339
+            },
+            "Steel - Carbon, 1% C": {
+                "100": 43.0
+            },
+            "Aluminum": {
+                "100": 239.14961
+            }
+        },
+        "h_values": [25, 100, 250],
+        "heat_sink_params":[
+            {
+                "n_fins":6, 
+                "fin_len":0.025, 
+                "fin_wid":0.05, 
+                "fin_thk":0.005, 
+                "base_h":0.02
+            },
+            {
+                "n_fins":50, 
+                "fin_len":0.010, 
+                "fin_wid":0.020, 
+                "fin_thk":0.001, 
+                "base_h":0.030
+            },
+            {
+                "n_fins":20, 
+                "fin_len":0.050, 
+                "fin_wid":0.200, 
+                "fin_thk":0.010, 
+                "base_h":0.200
+            }
+        ]
+    },
+    "hx_coefficients_data":{
+        "matls":[
+            "Aluminum", 
+            "Aluminum bronze", 
+            "Copper",
+            "Copper - Bronze (75% Cu, 25% Sn)",
+            "Gold",
+            "Iron",
+            "Iron - Wrought",
+            "Platinum",
+            "Silver",
+            "Steel - Carbon, 1% C",
+            "Steel - Hastelloy C",
+            "Titanium",
+            "Tungsten"
+        ],
+        "temps":[
+            -40,
+            0,
+            20,
+            100,
+            200,
+            500
+        ]
+    }
+}
