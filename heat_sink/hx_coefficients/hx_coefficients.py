@@ -38,9 +38,6 @@ import os
 import pandas as pd
 from scipy.interpolate.interpolate import interp1d
 
-# ============================================================================================================
-# Class Definitions:
-# ============================================================================================================
 class __MaterialProperties:
     def __init__(self):
         """
@@ -122,25 +119,45 @@ class __MaterialProperties:
             k_val = float(k_interp(temp))
         return k_val
 
+matl_prop = (
+    __MaterialProperties()
+)  # Object used to extract material property information
+# matl_prop._matl_names to retrieve available material names
+# matl_prop.k_val(matl, temp) to retrieve k value based on temperature
+# matl_prop._matl_df_full to retrieve a full dataframe of material k values at various temperatures
+# matl_prop._matl_df to retrieve a dict containing a DataFrame for each _matl_names entry
 
 class HxCoefficient:
-    def __init__(self, k, h):
+    def __init__(self, k=0, h=0, matl=None, temp=None):
         """Heat transfer coefficient object.
         This object is used to store coefficient values for heat transfer calculations.
         This class was designed for use in iterative design calculators.
         All iterations of the design objects should contain a reference to a single
         HxCoefficient object for ease of use.
 
+        Note on instance creation:
+            HxCoefficients can be created via the following methods:
+                (A): k, h inputs
+                    Values for k and h are directly set on instance creation.
+                    If matl and temp inputs are provided, these will be for reference only.
+                    Otherwise matl and temp will default to none.
+                (B): h, matl, temp inputs
+                    Value for h is directly set on instance creation.
+                    k value is calculated based on material data for matl at temperature temp.
+
         Parameters
         ----------
         k : float
             Thermal conducitivty coefficient k.
             Units: W / m K
+            Default is 0, the following methods can be used to set k:
+                (A) k is set to a positive number.
+                (B) matl and temp are defined.
             This parameter is a material property and varies with temperature.
-            Use material_k_val() function for common material k values.
         h : float
             Heat transfer coefficient h.
             Units: W / m^2 K
+            Default is 0 and must be overriden.
             This parameter varies based on a significant number of parameters, such as:
                 Flow characteristics
                 Fluid properties
@@ -151,6 +168,15 @@ class HxCoefficient:
             Typical heat transfer coefficients:
                 Free convection:    5 - 25
                 Forced convection:  25 - 250
+        matl : str
+            Definition for the material.
+            Default is None.
+            Used as reference for input method (A), used to calculate k for input method (B).
+            Use HxCoefficient.get_matl_names() for available materials.
+        temp : float
+            Temperature of the material for the given k value, in Celcius
+            Default is None.
+            Used as reference for input method (A), used to calculate k for input method (B).
 
             Ref:
                 Cengel, Y.A. & Ghajar, A.J., (2015).
@@ -158,22 +184,61 @@ class HxCoefficient:
                 McGraw Hill-Education, New York, NY.
 
         """
+        # Input validation: Type check on numeric inputs
+        try:
+            if k: k = float(k)
+            if h: h = float(h)
+            if temp: temp = float(temp)
+        except:
+            raise TypeError('Invalid input parameter types. Must be numeric for k, h, and temp')
 
-        self.k = k
-        self.h = h
+        # Input validation: k value
+        if k <= 0:
+            if matl and temp: # If matl and temp are provided without k, calculate them
+                self.k = self._get_matl_prop(matl, temp)
+            elif not matl or not temp: # Not enough inputs
+                raise ValueError('Value must be entered for k or matl and temp.')
+            else: # Bad k input
+                raise ValueError('k must be a positive non-zero number.')
+        elif k > 0: # Correct k input
+            self.k = k
+        
+        # Input validation: h value
+        if h <= 0:
+            raise ValueError('h must be a positive non-zero number.')
+        else:
+            self.h = h
 
+        self.matl = matl
+        self.temp = temp
+    
+    def _get_matl_prop(self, matl, temp):
+        """Calculates k values from material and temperature.
 
-# ============================================================================================================
-# Object Definitions:
-# ============================================================================================================
-matl_prop = (
-    __MaterialProperties()
-)  # Object used to extract material property information
-# matl_prop._matl_names to retrieve available material names
-# matl_prop.k_val(matl, temp) to retrieve k value based on temperature
-# matl_prop._matl_df_full to retrieve a full dataframe of material k values at various temperatures
-# matl_prop._matl_df to retrieve a dict containing a DataFrame for each _matl_names entry
+        Parameters
+        ----------
+        matl : str
+            Material name.
+        temp : float
+            Temperature, in Celcius.
 
+        Returns
+        -------
+        k_val : float
+            k value for the given material and temperature
+        """
+        return matl_prop.k_val(matl, temp)
+
+    def get_matl_names(self):
+        """Returns valid material names for k-value calculations.
+        For use when creating HxCoefficient objects from matl and temp inputs.
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        return matl_prop._matl_names
 
 if __name__ == "__main__":
     print("Test run of heat_sink.py")
